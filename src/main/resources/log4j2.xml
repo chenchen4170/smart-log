@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- monitorInterval配置成一个正整数，则每隔这么久的时间（秒），log4j2会刷新一次配置。如果不配置则不会动态刷新 -->
+<Configuration status="DEBUG" monitorInterval="30">
+    <Properties>
+        <Property name="baseLogDir">../logs</Property>
+        <Property name="pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%level][%t] msgId:[%X{msgId}] %c - %msg%n</Property>
+    </Properties>
+    <!-- 先定义所有的appender -->
+    <Appenders>
+        <!-- 这个输出控制台的配置 -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout>
+                <Pattern>${pattern}</Pattern>
+            </PatternLayout>
+        </Console>
+        <!-- 应用info日志 -->
+        <RollingRandomAccessFile name="FILE_APPENDER" fileName="${baseLogDir}/app.log"
+                                 filePattern="${baseLogDir}/app.log.%d{yyyyMMddHH}.%i.gz">
+            <PatternLayout>
+                <Pattern>${pattern}</Pattern>
+            </PatternLayout>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="500MB"/>
+                <TimeBasedTriggeringPolicy interval="24" modulate="true"/>
+            </Policies>
+            <!--<Filters>
+                <ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY" />
+            </Filters>-->
+            <!-- max=20标识一小时内最多产生20个日志文件 -->
+            <DefaultRolloverStrategy max="20">
+                <!-- 对于指定的路径下的指定后缀的文件，只保留3天的日志文件，那么最多会有3天*24小时*20个日志文件 -->
+                <!-- 注意应用需要根据业务需求和磁盘大小评估需要保留的日志个数，对于500M的日志文件来说，要根据应用日志的情况，观察单个日志压缩后文件大小，并计算总大小需要的空间 -->
+                <Delete basePath="${baseLogDir}" maxDepth="1">
+                    <IfFileName glob="*.gz"/>
+                    <IfLastModified age="3d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingRandomAccessFile>
+
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+        </Root>
+        <logger name="online.toosimple" level="INFO"/>
+        <logger name="org.springframework" level="INFO"/>
+
+
+    </Loggers>
+</Configuration>

@@ -63,7 +63,7 @@ public class TestController {
     //使用R对象返回统一格式
     @PostMapping("/smart/log/post/body/return/r/success")
     public R<GetRespVo> testPostBodyReturnRSuccess(@RequestBody PostReqVo vo) {
-        log.info("name: {}, age: {}", vo.getName(), vo.getAge());
+        log.info("this is log in controller method");
         GetRespVo resp = new GetRespVo();
         resp.setName(vo.getName());
         resp.setAge(vo.getAge());
